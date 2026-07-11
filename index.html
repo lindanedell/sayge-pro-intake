@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SAYge Pro — Profile Setup</title>
+<style>
+  :root{
+    --teal:#136E6B; --living:#1C8B83; --mint:#DCEFEA; --gold:#F0B53C;
+    --appbg:#F6F7F4; --card:#FFFFFF; --border:#E7E9E7;
+    --text:#23302E; --text2:#5C665F; --muted:#8A938C; --error:#C0584F;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--appbg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 16px 72px}
+  .brand{font-size:20px;font-weight:800;color:var(--teal);letter-spacing:.2px}
+  h1{font-size:26px;margin:6px 0 4px}
+  .sub{color:var(--text2);font-size:15px;margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin:16px 0}
+  .card h2{font-size:18px;margin:0 0 12px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin:14px 0 6px}
+  input[type=text],input[type=email],input[type=url],input[type=number],textarea{
+    width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;
+    background:var(--appbg);font-size:16px;color:var(--text);font-family:inherit}
+  textarea{min-height:120px;resize:vertical}
+  input:focus,textarea:focus{outline:none;border-color:var(--teal);background:#fff}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    border:none;border-radius:13px;padding:15px 18px;font-size:16px;font-weight:700;
+    cursor:pointer;font-family:inherit;width:100%}
+  .btn-primary{background:var(--teal);color:#fff}
+  .btn-primary:disabled{opacity:.6;cursor:default}
+  .btn-secondary{background:var(--mint);color:var(--teal);padding:13px 16px;font-size:15px}
+  .help{font-size:13px;color:var(--text2);margin:0 0 14px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .tag{display:inline-flex;align-items:center;gap:7px;background:var(--teal);color:#fff;
+    border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600}
+  .tag button{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1;padding:0}
+  .suggest{display:inline-flex;align-items:center;background:var(--appbg);border:1px solid var(--border);
+    color:var(--text2);border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;cursor:pointer}
+  .suggest:hover{border-color:var(--teal);color:var(--teal)}
+  .photo{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .photo .circle{width:64px;height:64px;border-radius:50%;background:var(--mint);
+    border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;
+    overflow:hidden;flex:0 0 auto}
+  .photo .circle img{width:100%;height:100%;object-fit:cover}
+  .photo .circle span{font-size:24px;color:var(--teal);font-weight:800}
+  .res{display:flex;align-items:center;gap:12px;background:var(--appbg);border:1px solid var(--border);
+    border-radius:12px;padding:13px;margin-bottom:10px}
+  .res .info{flex:1;min-width:0}
+  .res .t{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res .m{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res .kind{font-size:11px;font-weight:800;color:var(--teal);background:var(--mint);
+    border-radius:999px;padding:3px 9px;text-transform:uppercase}
+  .res button.del{background:none;border:none;color:var(--error);font-size:18px;cursor:pointer}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    background:var(--text);color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;
+    max-width:90%;box-shadow:0 6px 24px rgba(0,0,0,.2);opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+  .toast.err{background:var(--error)}
+  .row2{display:flex;gap:12px}
+  .row2>div{flex:1}
+  .note{font-size:13px;color:var(--text2);text-align:center;margin-top:18px}
+  .hidden{display:none}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;
+    border-radius:50%;animation:spin .7s linear infinite}
+  .spinner.teal{border-color:rgba(19,110,107,.3);border-top-color:var(--teal)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- STEP 1: EMAIL -->
+  <div id="step-email">
+    <div class="brand">SAYge</div>
+    <h1>SAYge Pro Profile</h1>
+    <p class="sub">Welcome! Enter the email address your invitation was sent to. You can build your
+      profile and add your evergreen content, programs, and links.</p>
+    <div class="card">
+      <label for="email">Your email</label>
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+      <div style="height:14px"></div>
+      <button class="btn btn-primary" id="btn-continue">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: FORM -->
+  <div id="step-form" class="hidden">
+    <div class="brand">SAYge</div>
+    <h1>Your Pro Profile</h1>
+    <p class="sub" id="form-email"></p>
+
+    <div class="card">
+      <h2>About You</h2>
+      <div class="photo">
+        <div class="circle" id="photo-circle"><span id="photo-ph">+</span></div>
+        <div>
+          <button class="btn btn-secondary" id="btn-photo" style="width:auto">Upload headshot</button>
+          <div class="help" style="margin:6px 0 0">JPG or PNG. Square works best.</div>
+        </div>
+      </div>
+
+      <label for="name">Name *</label>
+      <input type="text" id="name" placeholder="Your full name" />
+
+      <label for="role">Role / Title</label>
+      <input type="text" id="role" placeholder="e.g., Career &amp; Life-Transition Coach" />
+
+      <label for="bio">Bio</label>
+      <textarea id="bio" placeholder="Tell women who you are and how you help."></textarea>
+
+      <div class="row2">
+        <div>
+          <label for="years">Years of experience</label>
+          <input type="number" id="years" placeholder="e.g., 11" min="0" />
+        </div>
+      </div>
+
+      <label for="booking">Booking link (Calendly, Acuity, etc.)</label>
+      <input type="url" id="booking" placeholder="https://" />
+
+      <label for="video">Intro video link (YouTube, Vimeo, Loom)</label>
+      <input type="url" id="video" placeholder="https://" />
+    </div>
+
+    <div class="card">
+      <h2>Specialties</h2>
+      <p class="help">The areas you coach in. Add your own, or tap a common one below.</p>
+      <div class="tags" id="tags"></div>
+      <label for="tag-input">Add a specialty</label>
+      <input type="text" id="tag-input" placeholder="Type an area and press Enter" />
+      <div class="tags" id="suggestions" style="margin-top:10px"></div>
+    </div>
+
+    <button class="btn btn-primary" id="btn-save">Save Profile</button>
+
+    <div class="card">
+      <h2>Evergreen Content, Programs &amp; Links</h2>
+      <p class="help">Add files (PDFs, worksheets, program guides) or links (courses, videos, resources).
+        Save your profile first, then add as many as you like.</p>
+
+      <div id="res-list"></div>
+
+      <label>Add a link</label>
+      <input type="text" id="link-title" placeholder="Title (e.g., My Confidence Course)" />
+      <div style="height:10px"></div>
+      <input type="url" id="link-url" placeholder="https://" />
+      <div style="height:10px"></div>
+      <button class="btn btn-secondary" id="btn-add-link">+ Add Link</button>
+
+      <label style="margin-top:22px">Add a file</label>
+      <input type="text" id="file-title" placeholder="Title (e.g., Burnout Recovery Workbook)" />
+      <div style="height:10px"></div>
+      <button class="btn btn-secondary" id="btn-add-file">Choose File &amp; Upload</button>
+      <input type="file" id="file-input" class="hidden" />
+    </div>
+
+    <p class="note">All set? You can close this page — your work is saved. Come back anytime with the
+      same link and email to make changes.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var SUPA = "https://bgtbcvwjxoauhpilwbiy.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJndGJjdndqeG9hdWhwaWx3Yml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNzkyNTEsImV4cCI6MjA4Mzc1NTI1MX0.bijwt4LIaHg4m0IqjSCHjTgBhtPL0rVZvGrobsBblZI";
+  var FUNC = SUPA + "/functions/v1/pro-intake";
+  var BUCKET = "pro-resources";
+  var SUGGESTIONS = ["Career","Burnout","Relationships","Grief","Parenting","Health",
+    "Confidence","Life Transitions","Leadership","Stress Management","Entrepreneurship"];
+
+  var email = "", photoUrl = "", specialties = [], resources = [];
+  var $ = function(id){ return document.getElementById(id); };
+
+  function toast(msg, isErr){
+    var t = $("toast"); t.textContent = msg;
+    t.className = "toast show" + (isErr ? " err" : "");
+    setTimeout(function(){ t.className = "toast" + (isErr ? " err" : ""); }, 3200);
+  }
+
+  function call(body){
+    return fetch(FUNC, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "apikey":ANON, "Authorization":"Bearer "+ANON },
+      body: JSON.stringify(body)
+    }).then(function(r){
+      return r.json().then(function(d){
+        if(!r.ok) throw new Error(d && d.error ? d.error : "Request failed");
+        return d;
+      });
+    });
+  }
+
+  function uploadFile(file, path){
+    return fetch(SUPA + "/storage/v1/object/" + BUCKET + "/" + path, {
+      method:"POST",
+      headers:{ "apikey":ANON, "Authorization":"Bearer "+ANON, "Content-Type": file.type || "application/octet-stream" },
+      body: file
+    }).then(function(r){
+      if(!r.ok) return r.text().then(function(t){ throw new Error("Upload failed"); });
+      return SUPA + "/storage/v1/object/public/" + BUCKET + "/" + path;
+    });
+  }
+
+  function sanitize(s){ return (s||"").toLowerCase().replace(/[^a-z0-9]/g,"_"); }
+
+  // ---------- specialties tags ----------
+  function renderTags(){
+    var box = $("tags"); box.innerHTML = "";
+    specialties.forEach(function(s, i){
+      var el = document.createElement("span");
+      el.className = "tag";
+      el.appendChild(document.createTextNode(s));
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = "×";
+      b.onclick = function(){ specialties.splice(i,1); renderTags(); };
+      el.appendChild(b);
+      box.appendChild(el);
+    });
+    var sug = $("suggestions"); sug.innerHTML = "";
+    SUGGESTIONS.filter(function(s){ return specialties.indexOf(s) === -1; }).forEach(function(s){
+      var el = document.createElement("span");
+      el.className = "suggest"; el.textContent = "+ " + s;
+      el.onclick = function(){ specialties.push(s); renderTags(); };
+      sug.appendChild(el);
+    });
+  }
+  function addTag(v){
+    v = (v||"").trim().replace(/,$/,"").trim();
+    if(v && specialties.indexOf(v) === -1){ specialties.push(v); renderTags(); }
+  }
+
+  // ---------- resources ----------
+  function renderResources(){
+    var list = $("res-list"); list.innerHTML = "";
+    resources.forEach(function(r){
+      var row = document.createElement("div"); row.className = "res";
+      var kind = document.createElement("span"); kind.className = "kind";
+      kind.textContent = r.resource_type === "link" ? "Link" : "File";
+      var info = document.createElement("div"); info.className = "info";
+      var t = document.createElement("div"); t.className = "t"; t.textContent = r.resource_title;
+      var m = document.createElement("div"); m.className = "m";
+      m.textContent = r.resource_type === "link" ? r.link_url : (r.file_name || "");
+      info.appendChild(t); info.appendChild(m);
+      var del = document.createElement("button"); del.className = "del"; del.textContent = "×";
+      del.onclick = function(){ removeResource(r.id); };
+      row.appendChild(kind); row.appendChild(info); row.appendChild(del);
+      list.appendChild(row);
+    });
+  }
+  function removeResource(id){
+    call({ action:"delete_resource", email:email, resource_id:id }).then(function(){
+      resources = resources.filter(function(r){ return r.id !== id; });
+      renderResources();
+    }).catch(function(e){ toast(e.message, true); });
+  }
+
+  // ---------- step 1: email ----------
+  $("btn-continue").onclick = function(){
+    var v = $("email").value.toLowerCase().trim();
+    if(v.indexOf("@") === -1){ toast("Please enter a valid email address.", true); return; }
+    var btn = this; btn.disabled = true; btn.textContent = "Loading…";
+    email = v;
+    call({ action:"get", email:email }).then(function(d){
+      if(d.profile){
+        $("name").value = d.profile.name || "";
+        $("role").value = d.profile.role_title || "";
+        $("bio").value = d.profile.bio || "";
+        $("years").value = d.profile.years_experience || "";
+        $("booking").value = d.profile.booking_url || "";
+        $("video").value = d.profile.video_url || "";
+        specialties = d.profile.specialties || [];
+        if(d.profile.photo_url){ photoUrl = d.profile.photo_url; showPhoto(photoUrl); }
+      }
+      resources = d.resources || [];
+      renderTags(); renderResources();
+      $("form-email").textContent = email;
+      $("step-email").className = "hidden";
+      $("step-form").className = "";
+      window.scrollTo(0,0);
+    }).catch(function(e){
+      toast(e.message, true); btn.disabled = false; btn.textContent = "Continue";
+    });
+  };
+  $("email").addEventListener("keydown", function(e){ if(e.key === "Enter") $("btn-continue").click(); });
+
+  // ---------- photo ----------
+  function showPhoto(url){
+    var c = $("photo-circle"); c.innerHTML = "";
+    var img = document.createElement("img"); img.src = url; c.appendChild(img);
+  }
+  var photoInput = document.createElement("input");
+  photoInput.type = "file"; photoInput.accept = "image/*"; photoInput.className = "hidden";
+  document.body.appendChild(photoInput);
+  $("btn-photo").onclick = function(){ photoInput.click(); };
+  photoInput.onchange = function(){
+    var file = photoInput.files[0]; if(!file) return;
+    var btn = $("btn-photo"); btn.disabled = true; btn.textContent = "Uploading…";
+    var ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    var path = "headshots/" + sanitize(email) + "-" + Date.now() + "." + ext;
+    uploadFile(file, path).then(function(url){
+      photoUrl = url; showPhoto(url);
+      btn.disabled = false; btn.textContent = "Replace headshot";
+    }).catch(function(e){
+      toast(e.message, true); btn.disabled = false; btn.textContent = "Upload headshot";
+    });
+  };
+
+  // ---------- specialties input ----------
+  $("tag-input").addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === ","){ e.preventDefault(); addTag(this.value); this.value = ""; }
+  });
+
+  // ---------- save ----------
+  $("btn-save").onclick = function(){
+    if(!$("name").value.trim()){ toast("Please enter your name.", true); return; }
+    var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    call({ action:"save", email:email, profile:{
+      name: $("name").value.trim(),
+      role_title: $("role").value.trim() || null,
+      bio: $("bio").value.trim() || null,
+      years_experience: $("years").value ? parseInt($("years").value,10) : null,
+      booking_url: $("booking").value.trim() || null,
+      video_url: $("video").value.trim() || null,
+      photo_url: photoUrl || null,
+      specialties: specialties
+    }}).then(function(){
+      toast("Saved! You can add resources below.");
+      btn.disabled = false; btn.textContent = "Save Profile";
+    }).catch(function(e){
+      toast(e.message, true); btn.disabled = false; btn.textContent = "Save Profile";
+    });
+  };
+
+  // ---------- add link ----------
+  $("btn-add-link").onclick = function(){
+    var title = $("link-title").value.trim(), url = $("link-url").value.trim();
+    if(!title || !url){ toast("Add both a title and a link.", true); return; }
+    var btn = this; btn.disabled = true;
+    call({ action:"add_resource", email:email, resource:{
+      resource_title:title, resource_type:"link", link_url:url
+    }}).then(function(d){
+      resources.unshift(d.resource); renderResources();
+      $("link-title").value = ""; $("link-url").value = "";
+      btn.disabled = false;
+    }).catch(function(e){ toast(e.message + " (Save your profile first.)", true); btn.disabled = false; });
+  };
+
+  // ---------- add file ----------
+  $("btn-add-file").onclick = function(){
+    if(!$("file-title").value.trim()){ toast("Give this file a title first.", true); return; }
+    $("file-input").click();
+  };
+  $("file-input").onchange = function(){
+    var file = $("file-input").files[0]; if(!file) return;
+    var title = $("file-title").value.trim();
+    var btn = $("btn-add-file"); btn.disabled = true; btn.innerHTML = '<span class="spinner teal"></span> Uploading…';
+    var safe = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+    var path = "resources/" + sanitize(email) + "/" + Date.now() + "-" + safe;
+    uploadFile(file, path).then(function(url){
+      return call({ action:"add_resource", email:email, resource:{
+        resource_title:title, resource_type:"file", file_url:url,
+        file_name:file.name, file_size:file.size, file_type:file.type
+      }});
+    }).then(function(d){
+      resources.unshift(d.resource); renderResources();
+      $("file-title").value = ""; $("file-input").value = "";
+      btn.disabled = false; btn.textContent = "Choose File & Upload";
+    }).catch(function(e){
+      toast(e.message + " (Save your profile first.)", true);
+      btn.disabled = false; btn.textContent = "Choose File & Upload";
+      $("file-input").value = "";
+    });
+  };
+
+})();
+</script>
+</body>
+</html>
