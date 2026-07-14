@@ -138,8 +138,8 @@
 
     <div class="card">
       <h2>Evergreen Content, Programs &amp; Links</h2>
-      <p class="help">Add files (PDFs, worksheets, program guides) or links (courses, videos, resources).
-        Save your profile first, then add as many as you like.</p>
+      <p class="help">Add as many links, files, and courses as you like — each one saves on its own,
+        and everything you enter is kept automatically.</p>
 
       <div id="res-list"></div>
 
@@ -323,11 +323,9 @@
     if(e.key === "Enter" || e.key === ","){ e.preventDefault(); addTag(this.value); this.value = ""; }
   });
 
-  // ---------- save ----------
-  $("btn-save").onclick = function(){
-    if(!$("name").value.trim()){ toast("Please enter your name.", true); return; }
-    var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
-    call({ action:"save", email:email, profile:{
+  // ---------- profile save (also auto-used before adding content) ----------
+  function profilePayload(){
+    return {
       name: $("name").value.trim(),
       role_title: $("role").value.trim() || null,
       bio: $("bio").value.trim() || null,
@@ -336,8 +334,18 @@
       video_url: $("video").value.trim() || null,
       photo_url: photoUrl || null,
       specialties: specialties
-    }}).then(function(){
-      toast("Saved! You can add resources below.");
+    };
+  }
+  // Auto-saves the profile so a Pro never has to "save first" before adding content.
+  function ensureProfile(){
+    if(!$("name").value.trim()){ return Promise.reject(new Error("Please add your name at the top first.")); }
+    return call({ action:"save", email:email, profile: profilePayload() });
+  }
+  $("btn-save").onclick = function(){
+    if(!$("name").value.trim()){ toast("Please enter your name.", true); return; }
+    var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    call({ action:"save", email:email, profile: profilePayload() }).then(function(){
+      toast("Profile saved.");
       btn.disabled = false; btn.textContent = "Save Profile";
     }).catch(function(e){
       toast(e.message, true); btn.disabled = false; btn.textContent = "Save Profile";
@@ -349,13 +357,14 @@
     var title = $("link-title").value.trim(), url = $("link-url").value.trim();
     if(!title || !url){ toast("Add both a title and a link.", true); return; }
     var btn = this; btn.disabled = true;
-    call({ action:"add_resource", email:email, resource:{
+    ensureProfile().then(function(){ return call({ action:"add_resource", email:email, resource:{
       resource_title:title, resource_type:"link", link_url:url
-    }}).then(function(d){
+    }}); }).then(function(d){
       resources.unshift(d.resource); renderResources();
       $("link-title").value = ""; $("link-url").value = "";
+      toast("Link added — add another if you like.");
       btn.disabled = false;
-    }).catch(function(e){ toast(e.message + " (Save your profile first.)", true); btn.disabled = false; });
+    }).catch(function(e){ toast(e.message, true); btn.disabled = false; });
   };
 
   // ---------- add course ----------
@@ -363,13 +372,14 @@
     var title = $("course-title").value.trim(), url = $("course-url").value.trim();
     if(!title || !url){ toast("Add both a title and a course link.", true); return; }
     var btn = this; btn.disabled = true;
-    call({ action:"add_resource", email:email, resource:{
+    ensureProfile().then(function(){ return call({ action:"add_resource", email:email, resource:{
       resource_title:title, resource_type:"course", link_url:url
-    }}).then(function(d){
+    }}); }).then(function(d){
       resources.unshift(d.resource); renderResources();
       $("course-title").value = ""; $("course-url").value = "";
+      toast("Course added — add another if you like.");
       btn.disabled = false;
-    }).catch(function(e){ toast(e.message + " (Save your profile first.)", true); btn.disabled = false; });
+    }).catch(function(e){ toast(e.message, true); btn.disabled = false; });
   };
 
   // ---------- add file ----------
@@ -383,7 +393,7 @@
     var btn = $("btn-add-file"); btn.disabled = true; btn.innerHTML = '<span class="spinner teal"></span> Uploading…';
     var safe = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
     var path = "resources/" + sanitize(email) + "/" + Date.now() + "-" + safe;
-    uploadFile(file, path).then(function(url){
+    ensureProfile().then(function(){ return uploadFile(file, path); }).then(function(url){
       return call({ action:"add_resource", email:email, resource:{
         resource_title:title, resource_type:"file", file_url:url,
         file_name:file.name, file_size:file.size, file_type:file.type
@@ -391,9 +401,10 @@
     }).then(function(d){
       resources.unshift(d.resource); renderResources();
       $("file-title").value = ""; $("file-input").value = "";
+      toast("File added — add another if you like.");
       btn.disabled = false; btn.textContent = "Choose File & Upload";
     }).catch(function(e){
-      toast(e.message + " (Save your profile first.)", true);
+      toast(e.message, true);
       btn.disabled = false; btn.textContent = "Choose File & Upload";
       $("file-input").value = "";
     });
