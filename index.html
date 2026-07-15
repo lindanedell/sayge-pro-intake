@@ -68,6 +68,16 @@
   .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;
     border-radius:50%;animation:spin .7s linear infinite}
   .spinner.teal{border-color:rgba(19,110,107,.3);border-top-color:var(--teal)}
+  .reslist{margin-top:12px}
+  .modal-overlay{position:fixed;inset:0;background:rgba(35,48,46,.55);display:none;
+    align-items:center;justify-content:center;padding:24px;z-index:60}
+  .modal-overlay.show{display:flex}
+  .modal{background:var(--card);border-radius:18px;padding:26px;max-width:420px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  .modal h3{margin:0 0 10px;font-size:20px;color:var(--text)}
+  .modal p{margin:0 0 20px;font-size:15px;color:var(--text2);line-height:1.5}
+  .modal-secondary{background:none;border:none;color:var(--muted);font-size:14px;font-weight:600;
+    cursor:pointer;width:100%;padding:12px 0 0;font-family:inherit}
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -142,20 +152,20 @@
       <p class="help">Add as many links, files, and courses as you like — each one saves on its own,
         and everything you enter is kept automatically.</p>
 
-      <div id="res-list"></div>
-
       <label>Add a link</label>
       <input type="text" id="link-title" placeholder="Title (e.g., Free Resource or Article)" />
       <div style="height:10px"></div>
       <input type="url" id="link-url" placeholder="https://" />
       <div style="height:10px"></div>
       <button class="btn btn-secondary" id="btn-add-link">+ Add Link</button>
+      <div id="link-list" class="reslist"></div>
 
       <label style="margin-top:22px">Add a file</label>
       <input type="text" id="file-title" placeholder="Title (e.g., Burnout Recovery Workbook)" />
       <div style="height:10px"></div>
       <button class="btn btn-secondary" id="btn-add-file">Choose File &amp; Upload</button>
       <input type="file" id="file-input" class="hidden" />
+      <div id="file-list" class="reslist"></div>
 
       <label style="margin-top:22px">Add a course</label>
       <input type="text" id="course-title" placeholder="Title (e.g., My Confidence Course)" />
@@ -163,12 +173,22 @@
       <input type="url" id="course-url" placeholder="https://" />
       <div style="height:10px"></div>
       <button class="btn btn-secondary" id="btn-add-course">+ Add Course</button>
+      <div id="course-list" class="reslist"></div>
     </div>
 
     <button class="btn btn-primary" id="btn-save">Save Profile</button>
 
     <p class="note">All set? You can close this page — your work is saved. Come back anytime with the
       same link and email to make changes.</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="email-modal">
+  <div class="modal">
+    <h3>Please use your invitation email</h3>
+    <p id="email-modal-text"></p>
+    <button class="btn btn-primary" id="modal-different">Use a different email</button>
+    <button type="button" id="modal-continue" class="modal-secondary">Continue with this email anyway</button>
   </div>
 </div>
 
@@ -247,11 +267,10 @@
 
   // ---------- resources ----------
   function renderResources(){
-    var list = $("res-list"); list.innerHTML = "";
+    var lists = { link: $("link-list"), file: $("file-list"), course: $("course-list") };
+    lists.link.innerHTML = ""; lists.file.innerHTML = ""; lists.course.innerHTML = "";
     resources.forEach(function(r){
       var row = document.createElement("div"); row.className = "res";
-      var kind = document.createElement("span"); kind.className = "kind";
-      kind.textContent = r.resource_type === "file" ? "File" : (r.resource_type === "course" ? "Course" : "Link");
       var info = document.createElement("div"); info.className = "info";
       var t = document.createElement("div"); t.className = "t"; t.textContent = r.resource_title;
       var m = document.createElement("div"); m.className = "m";
@@ -259,8 +278,8 @@
       info.appendChild(t); info.appendChild(m);
       var del = document.createElement("button"); del.className = "del"; del.textContent = "×";
       del.onclick = function(){ removeResource(r.id); };
-      row.appendChild(kind); row.appendChild(info); row.appendChild(del);
-      list.appendChild(row);
+      row.appendChild(info); row.appendChild(del);
+      (lists[r.resource_type] || lists.link).appendChild(row);
     });
   }
   function removeResource(id){
@@ -271,31 +290,51 @@
   }
 
   // ---------- step 1: email ----------
+  function applyProfile(p){
+    $("name").value = p.name || "";
+    $("role").value = p.role_title || "";
+    $("bio").value = p.bio || "";
+    $("years").value = p.years_experience || "";
+    $("booking").value = p.booking_url || "";
+    $("video").value = p.video_url || "";
+    specialties = p.specialties || [];
+    if(p.photo_url){ photoUrl = p.photo_url; showPhoto(photoUrl); }
+  }
+  function enterForm(){
+    renderTags(); renderResources();
+    $("form-email").textContent = email;
+    $("step-email").className = "hidden";
+    $("step-form").className = "";
+    window.scrollTo(0,0);
+  }
   $("btn-continue").onclick = function(){
     var v = $("email").value.toLowerCase().trim();
     if(v.indexOf("@") === -1){ toast("Please enter a valid email address.", true); return; }
     var btn = this; btn.disabled = true; btn.textContent = "Loading…";
     email = v;
     call({ action:"get", email:email }).then(function(d){
-      if(d.profile){
-        $("name").value = d.profile.name || "";
-        $("role").value = d.profile.role_title || "";
-        $("bio").value = d.profile.bio || "";
-        $("years").value = d.profile.years_experience || "";
-        $("booking").value = d.profile.booking_url || "";
-        $("video").value = d.profile.video_url || "";
-        specialties = d.profile.specialties || [];
-        if(d.profile.photo_url){ photoUrl = d.profile.photo_url; showPhoto(photoUrl); }
-      }
+      btn.disabled = false; btn.textContent = "Continue";
       resources = d.resources || [];
-      renderTags(); renderResources();
-      $("form-email").textContent = email;
-      $("step-email").className = "hidden";
-      $("step-form").className = "";
-      window.scrollTo(0,0);
+      if(d.profile){
+        applyProfile(d.profile);
+        enterForm();
+      } else {
+        // No profile for this email — likely not the invited address.
+        $("email-modal-text").textContent =
+          "We don't have a profile for " + email + ". Please use the exact email address your SAYge invitation was sent to.";
+        $("email-modal").className = "modal-overlay show";
+      }
     }).catch(function(e){
       toast(e.message, true); btn.disabled = false; btn.textContent = "Continue";
     });
+  };
+  $("modal-different").onclick = function(){
+    $("email-modal").className = "modal-overlay";
+    $("email").focus(); $("email").select();
+  };
+  $("modal-continue").onclick = function(){
+    $("email-modal").className = "modal-overlay";
+    enterForm();
   };
   $("email").addEventListener("keydown", function(e){ if(e.key === "Enter") $("btn-continue").click(); });
 
