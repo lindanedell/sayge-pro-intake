@@ -41,11 +41,13 @@
     color:var(--text2);border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;cursor:pointer}
   .suggest:hover{border-color:var(--teal);color:var(--teal)}
   .photo{display:flex;align-items:center;gap:14px;margin-bottom:6px}
-  .photo .circle{width:64px;height:64px;border-radius:50%;background:var(--mint);
+  .photo .circle{width:104px;height:104px;border-radius:50%;background:var(--mint);
     border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;
     overflow:hidden;flex:0 0 auto}
   .photo .circle img{width:100%;height:100%;object-fit:cover}
-  .photo .circle span{font-size:24px;color:var(--teal);font-weight:800}
+  .photo .circle span{font-size:34px;color:var(--teal);font-weight:800}
+  .link-danger{background:none;border:none;color:var(--error);font-weight:600;font-size:13px;
+    cursor:pointer;padding:6px 0 0;display:block;font-family:inherit}
   .res{display:flex;align-items:center;gap:12px;background:var(--appbg);border:1px solid var(--border);
     border-radius:12px;padding:13px;margin-bottom:10px}
   .res .info{flex:1;min-width:0}
@@ -98,6 +100,7 @@
         <div class="circle" id="photo-circle"><span id="photo-ph">+</span></div>
         <div>
           <button class="btn btn-secondary" id="btn-photo" style="width:auto">Upload headshot</button>
+          <button type="button" id="btn-photo-remove" class="link-danger" style="display:none">Remove photo</button>
           <div class="help" style="margin:6px 0 0">JPG or PNG. Square works best.</div>
         </div>
       </div>
@@ -134,8 +137,6 @@
       <div class="tags" id="suggestions" style="margin-top:10px"></div>
     </div>
 
-    <button class="btn btn-primary" id="btn-save">Save Profile</button>
-
     <div class="card">
       <h2>Evergreen Content, Programs &amp; Links</h2>
       <p class="help">Add as many links, files, and courses as you like — each one saves on its own,
@@ -163,6 +164,8 @@
       <div style="height:10px"></div>
       <button class="btn btn-secondary" id="btn-add-course">+ Add Course</button>
     </div>
+
+    <button class="btn btn-primary" id="btn-save">Save Profile</button>
 
     <p class="note">All set? You can close this page — your work is saved. Come back anytime with the
       same link and email to make changes.</p>
@@ -300,6 +303,13 @@
   function showPhoto(url){
     var c = $("photo-circle"); c.innerHTML = "";
     var img = document.createElement("img"); img.src = url; c.appendChild(img);
+    $("btn-photo").textContent = "Change photo";
+    $("btn-photo-remove").style.display = "block";
+  }
+  function clearPhotoUI(){
+    $("photo-circle").innerHTML = '<span>+</span>';
+    $("btn-photo").textContent = "Upload headshot";
+    $("btn-photo-remove").style.display = "none";
   }
   var photoInput = document.createElement("input");
   photoInput.type = "file"; photoInput.accept = "image/*"; photoInput.className = "hidden";
@@ -312,10 +322,16 @@
     var path = "headshots/" + sanitize(email) + "-" + Date.now() + "." + ext;
     uploadFile(file, path).then(function(url){
       photoUrl = url; showPhoto(url);
-      btn.disabled = false; btn.textContent = "Replace headshot";
+      return ensureProfile();          // save the headshot immediately
+    }).then(function(){
+      btn.disabled = false; toast("Headshot saved.");
     }).catch(function(e){
       toast(e.message, true); btn.disabled = false; btn.textContent = "Upload headshot";
     });
+  };
+  $("btn-photo-remove").onclick = function(){
+    photoUrl = ""; clearPhotoUI();
+    ensureProfile().then(function(){ toast("Photo removed."); }).catch(function(e){ toast(e.message, true); });
   };
 
   // ---------- specialties input ----------
