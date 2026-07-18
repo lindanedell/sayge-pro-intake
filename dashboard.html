@@ -44,7 +44,8 @@
   .name{font-size:18px;font-weight:800}
   .role{color:var(--text2);font-size:14px}
   .email{color:var(--muted);font-size:13px;word-break:break-all}
-  .edited{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
+  .edited{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
+  .neveropened{color:var(--error);font-weight:800}
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
   .chip{background:var(--appbg);border:1px solid var(--border);border-radius:999px;padding:4px 10px;
     font-size:12px;font-weight:600;color:var(--teal)}
@@ -132,7 +133,8 @@
     var booking=allPros.filter(function(p){return p.booking_url;}).length;
     var bio=allPros.filter(function(p){return p.bio;}).length;
     var content=allPros.filter(function(p){return p._res.length;}).length;
-    var s=[["Pros",n],["With photo",photo],["With booking link",booking],["With bio",bio],["Added content",content]];
+    var opened=allPros.filter(function(p){return p.last_opened_at;}).length;
+    var s=[["Pros",n],["Opened link",opened],["Never opened",n-opened],["With photo",photo],["With booking link",booking],["Added content",content]];
     $("stats").innerHTML=s.map(function(x){return '<div class="stat"><div class="n">'+x[1]+'</div><div class="l">'+x[0]+'</div></div>';}).join("");
     $("subline").textContent="Sorted by most recently edited. Live from the database.";
   }
@@ -160,7 +162,10 @@
         +'<div class="who"><div class="name">'+esc(p.name)+'</div>'
           +'<div class="role">'+esc(p.role_title||"")+'</div>'
           +'<div class="email">'+esc(p.email)+'</div></div>'
-        +'<div class="edited">edited<br>'+when(p.updated_at)+'</div>'
+        +'<div class="edited">'
+          +(p.last_opened_at?'opened '+when(p.last_opened_at):'<span class="neveropened">Never opened</span>')
+          +'<br>edited '+when(p.updated_at)
+          +'</div>'
       +'</div>'
       +(chips?'<div class="chips">'+chips+'</div>':"")
       +bioHtml+booking+video+resHtml
