@@ -118,6 +118,9 @@
       <label for="name">Name *</label>
       <input type="text" id="name" placeholder="Your full name" />
 
+      <label for="email-field">Email (you'll log in with this)</label>
+      <input type="email" id="email-field" placeholder="you@example.com" autocapitalize="none" autocomplete="email" />
+
       <label for="role">Role / Title</label>
       <input type="text" id="role" placeholder="e.g., Career &amp; Life-Transition Coach" />
 
@@ -302,6 +305,7 @@
   }
   function enterForm(){
     renderTags(); renderResources();
+    $("email-field").value = email;
     $("form-email").textContent = email;
     $("step-email").className = "hidden";
     $("step-form").className = "";
@@ -398,8 +402,16 @@
   }
   $("btn-save").onclick = function(){
     if(!$("name").value.trim()){ toast("Please enter your name.", true); return; }
+    var newEmail = $("email-field").value.toLowerCase().trim();
+    if(!newEmail || newEmail.indexOf("@") === -1){ toast("Please enter a valid email address.", true); return; }
     var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
-    call({ action:"save", email:email, profile: profilePayload() }).then(function(){
+    var step = Promise.resolve();
+    if(newEmail !== email){
+      step = call({ action:"change_email", email:email, new_email:newEmail }).then(function(){
+        email = newEmail; $("form-email").textContent = email;   // future saves/logins use the new email
+      });
+    }
+    step.then(function(){ return call({ action:"save", email:email, profile: profilePayload() }); }).then(function(){
       toast("Profile saved.");
       btn.disabled = false; btn.textContent = "Save Profile";
     }).catch(function(e){
