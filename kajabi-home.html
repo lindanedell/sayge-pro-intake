@@ -89,10 +89,8 @@
 
   /* featured wisdom */
   .feat{border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--card)}
-  .feat .media{position:relative;background:var(--feat-grad);padding:16px;min-height:150px;
+  .feat .media{position:relative;background:var(--feat-grad);padding:16px;min-height:210px;
     display:flex;flex-direction:column;justify-content:flex-end}
-  .feat .media::before{content:"";position:absolute;inset:0;opacity:.5;
-    background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 13px)}
   .feat .cat{position:absolute;top:14px;left:14px;z-index:2;background:rgba(0,0,0,.42);
     color:#fff;font-size:11px;font-weight:600;padding:5px 11px;border-radius:999px;backdrop-filter:blur(4px)}
   .feat .quote{position:relative;z-index:2;color:#fff;font-family:"Playfair Display",Georgia,serif;
@@ -148,7 +146,7 @@
     <p class="lede">Real women. Real stories. Lived wisdom — the moment you need it. Here's where to begin.</p>
 
     <!-- door 1: SAYge Match -->
-    <a class="door" href="#" data-link="sayge-match">
+    <a class="door" href="https://beacon-app-five.vercel.app/" data-link="sayge-match">
       <div class="tile forest">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M12 3l1.6 4.9L18.5 9l-4.9 1.6L12 15l-1.6-4.9L5.5 9l4.9-1.1L12 3z" fill="#E0912E"/>
@@ -197,12 +195,13 @@
     <!-- featured wisdom -->
     <div class="eyebrow">Featured Wisdom · New Real Story</div>
     <div class="feat">
-      <a class="media" href="#" data-link="real-story-carol" style="text-decoration:none">
-        <span class="cat">Relationships</span>
-        <p class="quote serif">"I rebuilt my life after the divorce I never saw coming."</p>
-        <div class="by">— Carol</div>
+      <a class="media" href="#" data-link="real-story-emily"
+         style="text-decoration:none;background-image:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.35) 52%,rgba(0,0,0,.8)),url('https://bgtbcvwjxoauhpilwbiy.supabase.co/storage/v1/object/public/pro-resources/site/featured-emily-1784429809.png');background-size:cover;background-position:center 18%">
+        <span class="cat">Motherhood</span>
+        <p class="quote serif">"I felt like I was in a dream — a hazy, confusing, never-ending cycle."</p>
+        <div class="by">— Emily</div>
       </a>
-      <a class="cta" href="#" data-link="real-story-carol" style="text-decoration:none">
+      <a class="cta" href="#" data-link="real-story-emily" style="text-decoration:none">
         <span class="play">
           <svg width="14" height="14" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg>
         </span>
@@ -233,28 +232,9 @@
       <svg class="chev sage" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
 
-    <div class="note">Placeholder links — destinations to be wired up.</div>
   </div>
 
-  <!-- bottom tab bar -->
-  <div class="tabbar">
-    <a class="tab active" href="#">
-      <svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7M6 10v9h12v-9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Home
-    </a>
-    <a class="tab" href="#">
-      <svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 4l1.4 4.2L17.5 9l-4.1 1.4L12 15l-1.4-4.6L6.5 9l4.1-.8L12 4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-      SAYge Match
-    </a>
-    <a class="tab" href="#">
-      <svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      Real Stories
-    </a>
-    <a class="tab" href="#">
-      <svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 10v4a1 1 0 001 1h2l9 4V5L7 9H5a1 1 0 00-1 1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M18 9a3 3 0 010 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      Commons
-    </a>
-  </div>
+  <!-- Bottom navigation is provided by Kajabi's native app nav — intentionally omitted -->
 </div>
 </body>
 </html>
