@@ -117,6 +117,12 @@
   @media (prefers-color-scheme: dark){ .tab.active .ic{color:var(--mint)} }
   .ic{color:var(--tab-inactive)}
   .note{font-size:11px;color:var(--text2);text-align:center;opacity:.6;margin:18px 0 4px}
+  #soon{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
+    background:#24443B;color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;
+    opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;z-index:100;
+    box-shadow:0 10px 30px rgba(0,0,0,.28)}
+  #soon.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-color-scheme: dark){ #soon{background:#EAF3EE;color:#0B0C0C} }
 </style>
 </head>
 <body>
@@ -236,5 +242,20 @@
 
   <!-- Bottom navigation is provided by Kajabi's native app nav — intentionally omitted -->
 </div>
+
+<div id="soon">Coming soon</div>
+<script>
+(function(){
+  var t=document.getElementById('soon'), timer;
+  // Any placeholder link (href="#") shows "Coming soon"; real links navigate normally.
+  document.querySelectorAll('a[href="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      t.className='show'; clearTimeout(timer);
+      timer=setTimeout(function(){ t.className=''; }, 2200);
+    });
+  });
+})();
+</script>
 </body>
 </html>
