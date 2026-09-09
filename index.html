@@ -21,11 +21,11 @@
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin:16px 0}
   .card h2{font-size:18px;margin:0 0 12px}
   label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin:14px 0 6px}
-  input[type=text],input[type=email],input[type=url],input[type=number],textarea{
+  input[type=text],input[type=email],input[type=url],input[type=number],textarea,select{
     width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;
     background:var(--appbg);font-size:16px;color:var(--text);font-family:inherit}
   textarea{min-height:120px;resize:vertical}
-  input:focus,textarea:focus{outline:none;border-color:var(--teal);background:#fff}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);background:#fff}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
     border:none;border-radius:13px;padding:15px 18px;font-size:16px;font-weight:700;
     cursor:pointer;font-family:inherit;width:100%}
@@ -136,6 +136,20 @@
 
       <label for="booking">Booking link (Calendly, Acuity, etc.)</label>
       <input type="url" id="booking" placeholder="https://" />
+
+      <label for="freecall">Do you offer a complimentary intro call?</label>
+      <select id="freecall" onchange="syncFreeCall()">
+        <option value="">— please choose —</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+
+      <div id="freecall-link-wrap" style="display:none">
+        <label for="freecalllink">Link for the complimentary call</label>
+        <input type="url" id="freecalllink" placeholder="https://" />
+        <p class="help">If it books through the same link as above, leave this blank and
+          we'll use your booking link.</p>
+      </div>
 
       <label for="video">Intro video link (YouTube, Vimeo, Loom)</label>
       <input type="url" id="video" placeholder="https://" />
@@ -293,12 +307,25 @@
   }
 
   // ---------- step 1: email ----------
+  // The link question only matters after a yes, so it stays out of the way until then.
+  function syncFreeCall(){
+    var on = $("freecall").value === "yes";
+    $("freecall-link-wrap").style.display = on ? "block" : "none";
+    if(!on){ $("freecalllink").value = ""; }
+  }
+
   function applyProfile(p){
     $("name").value = p.name || "";
     $("role").value = p.role_title || "";
     $("bio").value = p.bio || "";
     $("years").value = p.years_experience || "";
     $("booking").value = p.booking_url || "";
+    // A stored link implies yes; the explicit flag wins when it is set.
+    $("freecall").value = p.offers_free_call === true ? "yes"
+                        : p.offers_free_call === false ? "no"
+                        : (p.free_call_url ? "yes" : "");
+    $("freecalllink").value = p.free_call_url || "";
+    syncFreeCall();
     $("video").value = p.video_url || "";
     specialties = p.specialties || [];
     if(p.photo_url){ photoUrl = p.photo_url; showPhoto(photoUrl); }
@@ -390,6 +417,13 @@
       bio: $("bio").value.trim() || null,
       years_experience: $("years").value ? parseInt($("years").value,10) : null,
       booking_url: $("booking").value.trim() || null,
+      offers_free_call: $("freecall").value === "yes" ? true
+                      : $("freecall").value === "no" ? false : null,
+      // Blank means "same as my booking link" — resolved here so the app never has to
+      // guess which of the two to open.
+      free_call_url: $("freecall").value === "yes"
+        ? ($("freecalllink").value.trim() || $("booking").value.trim() || null)
+        : null,
       video_url: $("video").value.trim() || null,
       photo_url: photoUrl || null,
       specialties: specialties
